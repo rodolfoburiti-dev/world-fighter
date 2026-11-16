@@ -1,0 +1,34 @@
+WORLD FIGHTER — CRÉDITOS
+
+Paródia de humor. Personagens fictícios; não oficial.
+
+MÚSICAS
+
+Tela-título: "Volatile Reaction" — Kevin MacLeod (incompetech.com)
+Seleção de lutador: "Cyborg Ninja" — Kevin MacLeod (incompetech.com)
+Fase EUA: "Exhilarate" — Kevin MacLeod (incompetech.com)
+Fase Brasil (Nordeste): "Lagoa v2" — Kevin MacLeod (incompetech.com)
+Fase Rio (Blozo): "Suvaco do Cristo" — Kevin MacLeod (incompetech.com)
+Fase Rio (Blozinho): "Leblon" — Kevin MacLeod (incompetech.com)
+Fase Argentina: "Tango de Manzana" — Kevin MacLeod (incompetech.com)
+Fase Paraguai: "Latin Industries" — Kevin MacLeod (incompetech.com)
+Fase China: "Mountain Emperor" — Kevin MacLeod (incompetech.com)
+Fase Coreia do Norte: "Movement Proposition" — Kevin MacLeod (incompetech.com)
+Fase Rússia: "Padanaya Blokov" — Kevin MacLeod (incompetech.com)
+Fase Israel: "Lachaim" — Kevin MacLeod (incompetech.com)
+
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+Arquivos originais: https://incompetech.com/ — convertidos para 128 kbps com volume normalizado.
+
+EFEITOS SONOROS
+
+Golpes, defesas, golpes no ar, especiais, explosões, nocaute, quedas e impactos das telas:
+efeitos gravados do Mixkit (https://mixkit.co/free-sound-effects/), Mixkit Sound Effects Free License.
+Cortados, mixados e normalizados para o jogo (tools/preparar_efeitos.py).
+
+LOCUÇÃO
+
+Locutor (nomes dos lutadores, "Round one", "Fight!", "K.O.", "Perfect"...): voz da biblioteca do
+ElevenLabs, sem clonagem, com eco de fliperama.

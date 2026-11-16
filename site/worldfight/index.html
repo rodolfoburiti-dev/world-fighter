@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="World Fighter">
+<title>World Fighter — jogo de luta grátis no navegador | Playground</title>
+<meta name="description" content="World Fighter: jogo de luta arcade em pixel art com 10 líderes de 8 países. Grátis, direto no navegador, sem instalar. Jogue contra a CPU ou com um amigo. Paródia de humor.">
+<link rel="canonical" href="http://playground.gamer.free/worldfight/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="World Fighter — jogo de luta grátis no navegador">
+<meta property="og:description" content="10 líderes, 8 países, uma só arena. Grátis, sem instalar.">
+<meta property="og:image" content="http://playground.gamer.free/worldfight/capa.webp">
+<meta property="og:url" content="http://playground.gamer.free/worldfight/">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"World Fighter","url":"http://playground.gamer.free/worldfight/",
+ "description":"Jogo de luta arcade em pixel art com 10 líderes de 8 países, grátis no navegador.","image":"http://playground.gamer.free/worldfight/capa.webp",
+ "genre":["Luta","Arcade"],"gamePlatform":"Navegador web","playMode":["SinglePlayer","MultiPlayer"],"inLanguage":"pt-BR",
+ "trailer":{"@type":"VideoObject","name":"World Fighter — trailer","description":"Trailer com gameplay de World Fighter.","thumbnailUrl":"http://playground.gamer.free/worldfight/trailer.jpg","uploadDate":"2026-11-11","contentUrl":"http://playground.gamer.free/worldfight/trailer.mp4"},
+ "offers":{"@type":"Offer","price":"0","priceCurrency":"BRL"}}
+</script>
+<style>
+  @font-face {
+    font-family: 'PressStart';
+    src: url('assets/fonts/PressStart2P.woff2') format('woff2');
+    font-display: block;
+  }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #game { position: fixed; inset: 0; }
+  #back {
+    position: fixed; top: 8px; left: 10px; z-index: 2;
+    font: 10px 'PressStart', monospace; color: #9fb4ff; text-decoration: none; opacity: .7;
+  }
+  #back:hover { opacity: 1; }
+  #rotate {
+    display: none; position: fixed; inset: 0; z-index: 3; background: #000; color: #ffd63a;
+    font: 14px/1.8 'PressStart', monospace; text-align: center; place-items: center; padding: 24px;
+  }
+  @media (orientation: portrait) and (max-width: 820px) { #rotate { display: grid; } }
+</style>
+</head>
+<body>
+<div id="game"></div>
+<a id="back" href="/">← PLAYGROUND</a>
+<div id="rotate"><div>GIRE O APARELHO<br>PARA JOGAR NA HORIZONTAL</div></div>
+<noscript><p style="color:#fff;font-family:sans-serif;text-align:center">Ative o JavaScript para jogar.</p></noscript>
+<script>window.WF_VERSION = '__WF_VERSION__';</script>
+<script src="js/phaser.min.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

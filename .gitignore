@@ -1,0 +1,22 @@
+# Efeitos do Mixkit: a licença proíbe redistribuir os sons soltos (ver docs/ASSETS.md)
+site/worldfight/assets/sfx/
+
+# Cópia para publicar (tools/build_site.py)
+dist/
+
+# Material de trabalho e publicação do autor (não vão para o repositório)
+deploy/
+incoming/
+work/
+.claude/
+tools/voice_raw/
+.exportacao-world-fighter
+*.bak
+*.bak-*
+
+# Ambiente
+__pycache__/
+*.pyc
+node_modules/
+.venv/
+.env*

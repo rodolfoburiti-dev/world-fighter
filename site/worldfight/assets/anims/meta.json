@@ -1,0 +1,642 @@
+{
+ "xi": {
+  "originY": 0.9901639344262295,
+  "bodyH": 290.0,
+  "bodyW": 218.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.393,
+    "strength": 2.27
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.501,
+    "strength": 4.55
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.421,
+    "strength": 4.03
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.234,
+    "strength": 1.24
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.491,
+    "strength": 7.03
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "kim": {
+  "originY": 0.993421052631579,
+  "bodyH": 290.0,
+  "bodyW": 216.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.519,
+    "strength": 2.74
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.552,
+    "strength": 3.36
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.479,
+    "strength": 4.13
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.279,
+    "strength": 1.3
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.56,
+    "strength": 5.2
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "flavio": {
+  "originY": 0.993421052631579,
+  "bodyH": 290.0,
+  "bodyW": 204.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.564,
+    "strength": 3.88
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.547,
+    "strength": 3.56
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.422,
+    "strength": 3.34
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.331,
+    "strength": 2.24
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.617,
+    "strength": 12.64
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "netanyahu": {
+  "originY": 0.9936708860759493,
+  "bodyH": 290.0,
+  "bodyW": 230.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.536,
+    "strength": 1.61
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.656,
+    "strength": 2.52
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.438,
+    "strength": 1.21
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.351,
+    "strength": 1.09
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.495,
+    "strength": 1.78
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "bolsonaro": {
+  "originY": 0.9933774834437086,
+  "bodyH": 290.0,
+  "bodyW": 192.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.447,
+    "strength": 3.02
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.488,
+    "strength": 3.67
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.362,
+    "strength": 2.82
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.316,
+    "strength": 2.28
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.438,
+    "strength": 4.18
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "trump": {
+  "originY": 0.9904458598726115,
+  "bodyH": 290.0,
+  "bodyW": 224.5,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.504,
+    "strength": 2.77
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.521,
+    "strength": 3.07
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.45,
+    "strength": 4.3
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.303,
+    "strength": 1.89
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.483,
+    "strength": 3.76
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "milei": {
+  "originY": 0.990228013029316,
+  "bodyH": 290.0,
+  "bodyW": 200.5,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.485,
+    "strength": 2.21
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.54,
+    "strength": 3.38
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.387,
+    "strength": 2.29
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.333,
+    "strength": 2.08
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.487,
+    "strength": 3.95
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "putin": {
+  "originY": 0.9901639344262295,
+  "bodyH": 290.0,
+  "bodyW": 204.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.449,
+    "strength": 1.93
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.524,
+    "strength": 2.75
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.426,
+    "strength": 2.61
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.28,
+    "strength": 1.26
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.47,
+    "strength": 3.49
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "pena": {
+  "originY": 0.990228013029316,
+  "bodyH": 290.0,
+  "bodyW": 179.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.545,
+    "strength": 5.78
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.521,
+    "strength": 6.43
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.427,
+    "strength": 5.09
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.333,
+    "strength": 3.12
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.651,
+    "strength": 15.51
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ },
+ "lula": {
+  "originY": 0.9935275080906149,
+  "bodyH": 290.0,
+  "bodyW": 206.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.537,
+    "strength": 3.37
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.569,
+    "strength": 3.83
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.449,
+    "strength": 3.04
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.281,
+    "strength": 1.28
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.579,
+    "strength": 5.47
+   },
+   "block": {
+    "frames": 3
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
+ }
+}
