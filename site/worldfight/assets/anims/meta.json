@@ -192,9 +192,9 @@
   "alias": {}
  },
  "netanyahu": {
-  "originY": 0.9936708860759493,
+  "originY": 0.9935064935064936,
   "bodyH": 290.0,
-  "bodyW": 230.0,
+  "bodyW": 209.0,
   "anims": {
    "idle": {
     "frames": 4
@@ -209,26 +209,26 @@
    "jab": {
     "frames": 4,
     "impact": 2,
-    "reach": 0.536,
-    "strength": 1.61
+    "reach": 0.53,
+    "strength": 1.55
    },
    "strong": {
     "frames": 5,
     "impact": 2,
-    "reach": 0.656,
-    "strength": 2.52
+    "reach": 0.529,
+    "strength": 1.64
    },
    "lowkick": {
     "frames": 5,
     "impact": 2,
-    "reach": 0.438,
-    "strength": 1.21
+    "reach": 0.484,
+    "strength": 1.89
    },
    "highkick": {
     "frames": 5,
     "impact": 2,
-    "reach": 0.351,
-    "strength": 1.09
+    "reach": 0.285,
+    "strength": 0.77
    },
    "jump": {
     "frames": 5
@@ -236,8 +236,8 @@
    "special": {
     "frames": 5,
     "impact": 3,
-    "reach": 0.495,
-    "strength": 1.78
+    "reach": 0.485,
+    "strength": 2.01
    },
    "block": {
     "frames": 3
