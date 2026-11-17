@@ -58,6 +58,8 @@ export class BootScene extends Phaser.Scene {
     for (const id of [...FIGHTERS.map((f) => f.id), 'versus', 'title']) {
       this.load.audio(`voice-${id}`, v(`voice/${id}.mp3`));
     }
+    // fala de vitória própria de alguns lutadores (FIGHTERS[].winVoice)
+    for (const f of FIGHTERS.filter((x) => x.winVoice)) this.load.audio(`voice-win-${f.id}`, v(`voice/win-${f.id}.mp3`));
     // anúncios da luta (inglês, como no fliperama), cada um com duas tomadas
     for (const id of ANNOUNCER) {
       this.load.audio(`voice-${id}`, v(`voice/${id}.mp3`));

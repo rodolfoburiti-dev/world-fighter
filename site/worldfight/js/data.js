@@ -1,6 +1,6 @@
 // Elenco e países. A ordem segue a grade 5x2 da tela de seleção.
 export const FIGHTERS = [
-  { id: 'lula', name: 'MOLUSCULO', country: 'br' },
+  { id: 'lula', name: 'MOLUSCULO', country: 'br', winVoice: true }, // vitória: "Faz o L, meu filho!" (voice/win-lula.mp3)
   { id: 'milei', name: 'MILEÃO', country: 'ar' },
   { id: 'trump', name: 'TRUMPETE', country: 'us' },
   { id: 'pena', name: 'PEÑITA', country: 'py' },

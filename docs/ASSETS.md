@@ -33,7 +33,7 @@ As imagens dos lutadores e das animações foram geradas com IA (modelo de image
    | `strong` | 5 | `special` | 5 |
    | `lowkick` | 5 | `block` | 3 |
 
-   Mais `ko` (queda com quique) e `getup` (levantar).
+   Mais `ko` (queda com quique) e `getup` (levantar). Opcional: `win`, a comemoração de vitória própria do lutador (ex.: o Molusculo faz um "L" com a mão). Sem ela, o vencedor pula de alegria.
 2. **Importação:** `python tools/import_sheets.py` lê os quadros e gera em `assets/anims/`:
    - o atlas `<id>.json` + `<id>-<n>-<hash>.webp`;
    - o `meta.json`.
@@ -80,4 +80,4 @@ Neste repositório, `js/sfx-list.js` está vazio e o jogo sintetiza cada efeito 
 2. Coloque `fighters/<id>.webp`, `portraits/<id>.webp` e `tiles/<id>.webp`. A grade tem 5 × 2 posições: para mais lutadores, ajuste `COLS` e o tamanho em `scenes/select.js`.
 3. Gere as animações (passo a passo acima) e rode `tools/import_sheets.py`.
 4. Cenário: imagem em `stages/` e entrada em `js/stages.js`. Música: entrada no mapa `MP3` de `js/audio.js`.
-5. Opcional: voz do nome em `voice/<id>.mp3`, falas de combate e cor da bola de energia em `ORB` (`js/data.js`).
+5. Opcional: voz do nome em `voice/<id>.mp3`, falas de combate, cor da bola de energia em `ORB` (`js/data.js`) e fala de vitória em `voice/win-<id>.mp3` (marque `winVoice: true` no lutador em `FIGHTERS`).

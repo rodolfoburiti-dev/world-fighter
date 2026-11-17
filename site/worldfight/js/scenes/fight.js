@@ -311,6 +311,27 @@ export class FightScene extends Phaser.Scene {
     }
   }
 
+  // Fala de vitória do lutador (voice/win-<id>.mp3, ex.: "Faz o L, meu filho!"): 1,2 s depois do fim do round,
+  // logo após o "K.O." / "Time over" do locutor e enquanto ele faz a comemoração desenhada (animação "win").
+  hasWinVoice(i) {
+    return i >= 0 && this.cache.audio.exists(`voice-win-${this.defs[i].id}`);
+  }
+
+  winVoice(i) {
+    if (!this.hasWinVoice(i)) return;
+    const key = `win-${this.defs[i].id}`;
+    this.stopAttackVoice();
+    const delay = 1200;
+    const dur = this.cache.audio.get(`voice-${key}`)?.duration || 2.8;
+    this.winVoiceUntil = this.time.now + delay + dur * 1000;
+    say(this, key, delay);
+  }
+
+  // anúncio do resultado só depois da fala de vitória, para as vozes não se atropelarem
+  afterWinVoice(ms) {
+    return ms + Math.max(0, (this.winVoiceUntil || 0) - this.time.now);
+  }
+
   playAttackVoice(player) {
     const now = this.time.now;
     const voice = this.fighterVoices[player];
@@ -374,8 +395,9 @@ export class FightScene extends Phaser.Scene {
     }
     if (e.perfect) {
       this.time.delayedCall(1500, () => this.showBanner('PERFEITO!', { color: '#ffffff', hold: 1500 }));
-      say(this, 'perfect', 1550);
+      if (!this.hasWinVoice(e.winner)) say(this, 'perfect', 1550); // com fala de vitória, só o letreiro
     }
+    this.winVoice(e.winner);
     this.updateStars();
   }
 
@@ -496,7 +518,8 @@ export class FightScene extends Phaser.Scene {
         v.fell = true;
         Sound.sfx('fall');
       }
-      spr.setFlipX(f.face === -1);
+      // a comemoração desenhada não espelha (o "L" do Molusculo ficaria ao contrário): o corpo já está de frente
+      spr.setFlipX(f.face === -1 && !(f.state === 'win' && spr.meta.anims.win));
       spr.setPosition(f.x + pose.dx * f.face, GROUND_Y - f.y + pose.dy);
       spr.setScale(spr.baseScale * pose.sx, spr.baseScale * pose.sy);
       spr.setAngle(pose.lean * f.face);
@@ -520,7 +543,10 @@ export class FightScene extends Phaser.Scene {
     const count = (name) => m.anims[name].frames;
     const loop = (name, ms) => `${name}_${Math.floor(time / ms) % count(name)}`;
     switch (f.state) {
-      case 'idle': case 'win': return loop('idle', 110);
+      case 'idle': return loop('idle', 110);
+      case 'win': // comemoração própria (ex.: o "L" do Molusculo): toca uma vez e segura o último quadro
+        if (m.anims.win) return `win_${Math.min(m.anims.win.frames - 1, Math.floor(t * 9))}`;
+        return loop('idle', 110);
       case 'walk': return loop(f.vx * f.face >= 0 ? 'walkf' : 'walkb', 80);
       case 'crouch': return `crouch_${Math.min(m.anims.crouch.low, Math.floor(t * 40))}`;
       case 'blockstun': // defesa: braços na frente e o arco azul do impacto
@@ -607,8 +633,8 @@ export class FightScene extends Phaser.Scene {
         }
         break;
       }
-      case 'win':
-        dy = -Math.abs(Math.sin(t * 5)) * 16;
+      case 'win': // sem comemoração desenhada, o lutador pula de alegria
+        if (!this.sprites[f.index].meta.anims.win) dy = -Math.abs(Math.sin(t * 5)) * 16;
         break;
       default: break;
     }
@@ -716,12 +742,12 @@ export class FightScene extends Phaser.Scene {
       const remaining = FIGHTERS.filter((f) => f.id !== this.defs[0].id && !this.ladder.beaten.includes(f.id));
       if (remaining.length === 0) {
         title = 'CAMPEÃO!';
-        say(this, 'champion', 300);
+        say(this, 'champion', this.afterWinVoice(300));
         sub = `${w.name} DERROTOU TODOS OS LUTADORES`;
         items.push({ label: 'VOLTAR AO MENU', run: () => this.leave('title') });
       } else {
         title = 'VOCÊ VENCEU!';
-        say(this, 'youwin', 300);
+        say(this, 'youwin', this.afterWinVoice(300));
         sub = `${this.ladder.beaten.length} DE ${FIGHTERS.length - 1} ADVERSÁRIOS`;
         const next = Phaser.Utils.Array.GetRandom(remaining);
         items.push({ label: 'PRÓXIMA LUTA', run: () => this.leave('versus', { mode: this.mode, p1: this.defs[0].id, p2: next.id, ladder: this.ladder }) });
@@ -729,22 +755,22 @@ export class FightScene extends Phaser.Scene {
       }
     } else if (arcade) {
       title = 'VOCÊ PERDEU';
-      say(this, 'youlose', 300);
+      say(this, 'youlose', this.afterWinVoice(300));
       sub = `${w.name} VENCEU`;
       items.push({ label: 'TENTAR DE NOVO', run: () => this.leave('versus', { mode: this.mode, p1: this.defs[0].id, p2: this.defs[1].id, ladder: this.ladder }) });
       items.push({ label: 'ESCOLHER LUTADOR', run: () => this.leave('select', { mode: this.mode }) });
     } else if (this.online) {
       const won = winner === this.side;
       title = won ? 'VOCÊ VENCEU!' : 'VOCÊ PERDEU';
-      say(this, won ? 'youwin' : 'youlose', 300);
+      say(this, won ? 'youwin' : 'youlose', this.afterWinVoice(300));
       sub = this.rematch.them ? 'O OPONENTE QUER REVANCHE!' : `${w.name} VENCEU`;
       items.push({ label: 'REVANCHE', run: () => this.askRematch() });
       items.push({ label: 'TROCAR LUTADOR', run: () => { Net.send({ t: 'reselect' }); this.leave('select', { mode: 'online' }); } });
       items.push({ label: 'SAIR', run: () => this.quitOnline() });
     } else {
       title = `${w.name} VENCEU!`;
-      say(this, w.id, 300);
-      say(this, 'wins', 1250);
+      say(this, w.id, this.afterWinVoice(300));
+      say(this, 'wins', this.afterWinVoice(1250));
       sub = `JOGADOR ${winner + 1}`;
       items.push({ label: 'REVANCHE', run: () => this.leave('versus', { mode: this.mode, p1: this.defs[0].id, p2: this.defs[1].id }) });
       items.push({ label: 'ESCOLHER LUTADORES', run: () => this.leave('select', { mode: this.mode }) });

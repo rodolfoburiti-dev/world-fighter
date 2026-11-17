@@ -45,7 +45,9 @@ AI_STATES = {"idle": "idle", "walkf": "walk", "crouch": "crouch", "jab": "jab", 
 AI_USED = set()  # lutadores importados das tiras de IA nesta execução
 AI_KO = set()    # ... com nocaute (quique) e levantada também desenhados pela IA
 KO_BOUNCE = 4    # quadro do quique na tira de nocaute (0 = recuo do golpe ... 5 = esparramado)
-GUARD_FIRST = ("jab", "strong", "lowkick", "highkick", "special", "block", "crouch")  # tiras que começam na guarda
+GUARD_FIRST = ("jab", "strong", "lowkick", "highkick", "special", "block", "crouch", "win")  # tiras que começam na guarda
+# opcionais: só entram se a pasta existir (win = comemoração de vitória própria do lutador, ex.: o "L" do Molusculo)
+AI_OPTIONAL = {"win": "win"}
 LYING_DIR = os.path.join(ROOT, "incoming", "deitado")  # <id>.png: o lutador deitado de costas (gerado por IA)
 FALL_ANGLES = [0, 14, 32, 52, 70]  # a guarda caindo de costas (graus; anti-horário = cabeça para trás)
 LAND_ANGLES = [8, 3, 0, 0, 0]      # já deitado: o tronco bate e assenta no chão
@@ -427,7 +429,9 @@ def frames_from_ai(fid):
     Âncora horizontal: o calcanhar de trás, que fica plantado nos golpes (o corpo não "anda" quando o braço
     estica); no andar e no pulo, o centro do tronco."""
     raw = {}
-    for anim, st in AI_STATES.items():
+    states = dict(AI_STATES)
+    states.update({a: st for a, st in AI_OPTIONAL.items() if os.path.isdir(os.path.join(AI_DIR, fid, st))})
+    for anim, st in states.items():
         d = os.path.join(AI_DIR, fid, st)
         files = sorted((f for f in os.listdir(d) if f.startswith("frame-") and f.endswith(".png") and ".plain" not in f),
                        key=lambda f: int(f[6:-4]))
