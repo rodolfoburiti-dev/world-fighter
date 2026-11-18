@@ -365,7 +365,7 @@ export class SelectScene extends Phaser.Scene {
     const trail = this.add.graphics().setDepth(3.2);
     const plane = this.add.text(a.x, a.y, '✈', { fontFamily: 'sans-serif', fontSize: '26px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
       .setOrigin(0.5).setDepth(3.4);
-    Sound.sfx('plane');
+    Sound.plane(Math.sign(b.x - a.x), 1.65); // jato passando, do país de um até o do outro
     const state = { t: 0 };
     let lastDot = 0;
     this.tweens.add({

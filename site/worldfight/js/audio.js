@@ -89,6 +89,81 @@ class SoundEngine {
     return this.ctx.createPeriodicWave(real, imag);
   }
 
+  // Avião da tela de seleção (como no Street Fighter II): jato passando, com o ronco crescendo até o meio do voo,
+  // o assobio da turbina caindo de tom quando ele passa (efeito Doppler) e o som indo de um lado para o outro.
+  // pan: -1 = voa para a esquerda, 1 = para a direita, 0 = no meio.
+  plane(pan = 0, dur = 1.6) {
+    if (!this.ctx) return;
+    this.jet(this.ctx.currentTime, dur, pan);
+  }
+
+  jet(t, dur, pan) {
+    const c = this.ctx;
+    const peak = t + dur * 0.55;
+    const end = t + dur;
+    const out = c.createGain();
+    // chega crescendo, passa forte e vai sumindo (curva larga: o jato é ouvido o voo inteiro)
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.linearRampToValueAtTime(0.3, t + 0.12);
+    out.gain.linearRampToValueAtTime(0.85, peak);
+    out.gain.linearRampToValueAtTime(0.35, t + dur * 0.85);
+    out.gain.linearRampToValueAtTime(0.0001, end);
+    let node = out;
+    if (c.createStereoPanner && pan) {
+      const p = c.createStereoPanner();
+      p.pan.setValueAtTime(-0.8 * pan, t);
+      p.pan.linearRampToValueAtTime(0.8 * pan, end);
+      out.connect(p);
+      node = p;
+    }
+    node.connect(this.sfxBus);
+    const noise = (filterType, f0, f1, f2, q, vol) => {
+      const src = c.createBufferSource();
+      src.buffer = this.noise;
+      src.loop = true;
+      const bq = c.createBiquadFilter();
+      bq.type = filterType;
+      bq.Q.value = q;
+      bq.frequency.setValueAtTime(f0, t);
+      bq.frequency.exponentialRampToValueAtTime(f1, peak);
+      bq.frequency.exponentialRampToValueAtTime(f2, end);
+      const g = c.createGain();
+      g.gain.value = vol;
+      src.connect(bq).connect(g).connect(out);
+      src.start(t, Math.random() * 0.5);
+      src.stop(end + 0.05);
+    };
+    noise('lowpass', 300, 900, 250, 0.7, 1.1);    // ronco grave do motor
+    noise('bandpass', 700, 2200, 600, 0.9, 0.9);  // rajada de ar
+    // assobio da turbina: agudo chegando, cai de tom ao passar
+    for (const [type, mul, vol] of [['sawtooth', 1, 0.05], ['triangle', 1.5, 0.05]]) {
+      const o = c.createOscillator();
+      o.type = type;
+      o.frequency.setValueAtTime(1500 * mul, t);
+      o.frequency.linearRampToValueAtTime(1350 * mul, peak - 0.1);
+      o.frequency.exponentialRampToValueAtTime(820 * mul, end);
+      const bq = c.createBiquadFilter();
+      bq.type = 'bandpass';
+      bq.frequency.value = 1400 * mul;
+      bq.Q.value = 1.2;
+      const g = c.createGain();
+      g.gain.value = vol;
+      o.connect(bq).connect(g).connect(out);
+      o.start(t);
+      o.stop(end + 0.05);
+    }
+    // estrondo grave no meio da passagem
+    const sub = c.createOscillator();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(70, t);
+    sub.frequency.exponentialRampToValueAtTime(48, end);
+    const sg = c.createGain();
+    sg.gain.value = 0.35;
+    sub.connect(sg).connect(out);
+    sub.start(t);
+    sub.stop(end + 0.05);
+  }
+
   makeNoise() {
     const len = this.ctx.sampleRate;
     const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
@@ -538,8 +613,7 @@ class SoundEngine {
         this.tone({ f: 1760, type: 'square', t, dur: 0.04, vol: 0.12 });
         break;
       case 'plane':
-        this.burst({ t, dur: 1.2, vol: 0.35, fq: 300, fq2: 2500, q: 2 });
-        this.tone({ f: 220, f2: 440, type: 'sawtooth', t, dur: 1.2, vol: 0.05 });
+        this.jet(t, 1.6, 0);
         break;
       case 'vs':
         this.tone({ f: 80, f2: 35, type: 'sine', t, dur: 1.2, vol: 1 });
