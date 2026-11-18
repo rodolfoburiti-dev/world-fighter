@@ -17,7 +17,7 @@ Jogo de luta 2D para navegador no estilo dos fliperamas dos anos 90, com caricat
   - **Online:** contra um amigo em outro aparelho, por código de sala ou link de convite.
 - **Golpes:** jab, soco forte, chute alto, rasteira (derruba), golpes no ar, defesa e especial com bola de energia nas cores do país.
 - **Partidas:** melhor de 3 rounds de 99 segundos, com KO em câmera lenta, queda com quique, "PERFEITO" e revanche.
-- **Comemorações de vitória** próprias de cada lutador: o "L" do Molusculo, a camiseta rasgada do Blozo, a dancinha do Trumpete e outras, com fala.
+- **Comemorações de vitória** próprias de cada lutador: o "L" do Molusculo, a camiseta rasgada do Blozo, a dancinha do Trumpete, o polegar para baixo do XANDÃO ("Você foi subjugado") e outras, com fala.
 - **Celular e tablet:**
   - direcional analógico 360° flutuante e botões A/B/X/Y no estilo do controle do Xbox;
   - tela cheia automática;

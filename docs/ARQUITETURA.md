@@ -74,7 +74,7 @@ No celular e no tablet, `main.js` pede tela cheia ao primeiro toque e trava a te
   - o número de quadros de cada animação;
   - o quadro de impacto de cada golpe.
 - O **quadro de impacto** da animação coincide com os quadros ativos do golpe no motor (`frameFor`). Antes dele vem a preparação, depois a volta.
-- Animações: `idle`, `walkf`, `walkb`, `jab`, `strong`, `lowkick`, `highkick`, `crouch`, `jump`, `special`, `block`, `ko` (queda com quique) e `getup`. Opcional: `win`, a comemoração de vitória. Ela toca uma vez, segura o último quadro e não é espelhada, para gestos como o "L" do Molusculo não ficarem ao contrário. Junto, toca a fala de vitória (`voice/win-<id>.mp3`) 1,2 s depois do fim do round. No fim da luta, a ordem é:
+- Animações: `idle`, `walkf`, `walkb`, `jab`, `strong`, `lowkick`, `highkick`, `crouch`, `jump`, `special`, `block`, `ko` (queda com quique) e `getup`. Opcional: `win`, a comemoração de vitória. Ela toca uma vez, segura o último quadro e não é espelhada, para gestos como o "L" do Molusculo não ficarem ao contrário (com `winFlip: true` no `data.js` ela espelha como o resto do corpo, caso do polegar para baixo do XANDÃO, que olha para o derrotado). Junto, toca a fala de vitória (`voice/win-<id>.mp3`) 1,2 s depois do fim do round. No fim da luta, a ordem é:
   - "K.O.";
   - o locutor anuncia o vencedor ("Molusculo… wins!", com letreiro);
   - a comemoração com a fala;

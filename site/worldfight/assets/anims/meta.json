@@ -661,7 +661,7 @@
   "alias": {}
  },
  "moraes": {
-  "originY": 0.9934426229508196,
+  "originY": 0.9905660377358491,
   "bodyH": 290.0,
   "bodyW": 207.0,
   "anims": {
@@ -710,6 +710,9 @@
    },
    "block": {
     "frames": 3
+   },
+   "win": {
+    "frames": 5
    },
    "intro": {
     "frames": 6

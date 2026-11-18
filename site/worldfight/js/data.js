@@ -14,7 +14,7 @@ export const FIGHTERS = [
 
 // Chefe final do Arcade: só aparece depois de vencer os outros nove (não está na grade de seleção).
 // Entra voando com a toga, joga a toga fora e cai no chão; bate mais forte (power) e aguenta mais (armor).
-export const BOSS = { id: 'moraes', name: 'XANDÃO', country: 'br', boss: true, power: 1.35, armor: 0.75, winVoice: true };
+export const BOSS = { id: 'moraes', name: 'XANDÃO', country: 'br', boss: true, power: 1.35, armor: 0.75, winVoice: true, winFlip: true };
 export const ALL_FIGHTERS = [...FIGHTERS, BOSS];
 
 // Quem zera o jogo (vence o chefe no Arcade) libera o Xandão para jogar; fica guardado no navegador.

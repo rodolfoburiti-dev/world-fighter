@@ -593,8 +593,9 @@ export class FightScene extends Phaser.Scene {
         v.fell = true;
         Sound.sfx('fall');
       }
-      // a comemoração desenhada não espelha (o "L" do Molusculo ficaria ao contrário): o corpo já está de frente
-      spr.setFlipX(f.face === -1 && !(f.state === 'win' && spr.meta.anims.win));
+      // a comemoração desenhada não espelha (o "L" do Molusculo ficaria ao contrário): o corpo já está de frente.
+      // winFlip (data.js): gesto apontado para o derrotado (o polegar para baixo do Xandão) espelha normalmente
+      spr.setFlipX(f.face === -1 && !(f.state === 'win' && spr.meta.anims.win && !this.defs[f.index].winFlip));
       spr.setPosition(f.x + pose.dx * f.face, GROUND_Y - f.y + pose.dy);
       spr.setScale(spr.baseScale * pose.sx, spr.baseScale * pose.sy);
       spr.setAngle(pose.lean * f.face);
