@@ -195,7 +195,7 @@
   "alias": {}
  },
  "netanyahu": {
-  "originY": 0.9935064935064936,
+  "originY": 0.9908536585365854,
   "bodyH": 290.0,
   "bodyW": 209.0,
   "anims": {
@@ -244,6 +244,9 @@
    },
    "block": {
     "frames": 3
+   },
+   "win": {
+    "frames": 5
    },
    "walkb": {
     "frames": 6
