@@ -356,12 +356,13 @@ export class SelectScene extends Phaser.Scene {
 
   flyPlane(fromCountry, toCountry, done) {
     const a = mapPoint(fromCountry), b = mapPoint(toCountry);
-    const lift = Math.max(50, Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y) * 0.35);
-    const curve = new Phaser.Curves.QuadraticBezier(
-      new Phaser.Math.Vector2(a.x, a.y),
-      new Phaser.Math.Vector2((a.x + b.x) / 2, Math.min(a.y, b.y) - lift),
-      new Phaser.Math.Vector2(b.x, b.y),
-    );
+    const V = Phaser.Math.Vector2;
+    const dist = Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y);
+    // viagens curtas (Brasil → Paraguai, Argentina...) sobem num arco mais alto, para o avião sair de cima das
+    // bandeiras e ser visto; no mesmo país ele dá uma volta curta. Viagens longas continuam como sempre.
+    const curve = dist < 30
+      ? new Phaser.Curves.CubicBezier(new V(a.x, a.y), new V(a.x - 70, a.y - 120), new V(a.x + 70, a.y - 120), new V(b.x, b.y))
+      : new Phaser.Curves.QuadraticBezier(new V(a.x, a.y), new V((a.x + b.x) / 2, Math.min(a.y, b.y) - Math.max(dist < 160 ? 120 : 50, dist * 0.35)), new V(b.x, b.y));
     const trail = this.add.graphics().setDepth(3.2);
     const plane = this.add.text(a.x, a.y, '✈', { fontFamily: 'sans-serif', fontSize: '26px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
       .setOrigin(0.5).setDepth(3.4);
