@@ -89,90 +89,6 @@ class SoundEngine {
     return this.ctx.createPeriodicWave(real, imag);
   }
 
-  // Avião da tela de seleção (como no Street Fighter II): o ronco do jato durante todo o voo, começando junto
-  // com o avião e acabando quando ele pousa, com o assobio da turbina e o som indo de um lado para o outro.
-  // pan: -1 = voa para a esquerda, 1 = para a direita, 0 = no meio. dur = duração do voo (s).
-  plane(pan = 0, dur = 2.4) {
-    if (!this.ctx) return;
-    this.jet(this.ctx.currentTime + 0.01, dur, pan);
-  }
-
-  jet(t, dur, pan) {
-    const c = this.ctx;
-    const end = t + dur;
-    const out = c.createGain();
-    // entra na hora (o avião já está no ar), segura forte o voo inteiro e some no pouso
-    out.gain.setValueAtTime(0.0001, t);
-    out.gain.linearRampToValueAtTime(0.75, t + 0.06);
-    out.gain.linearRampToValueAtTime(0.9, t + dur * 0.5);
-    out.gain.linearRampToValueAtTime(0.75, end - 0.35);
-    out.gain.linearRampToValueAtTime(0.0001, end);
-    let node = out;
-    if (c.createStereoPanner && pan) {
-      const p = c.createStereoPanner();
-      p.pan.setValueAtTime(-0.7 * pan, t);
-      p.pan.linearRampToValueAtTime(0.7 * pan, end);
-      out.connect(p);
-      node = p;
-    }
-    node.connect(this.sfxBus);
-    // oscilação lenta do ronco (a turbulência do jato)
-    const lfo = c.createOscillator();
-    lfo.frequency.value = 5.5;
-    lfo.start(t);
-    lfo.stop(end + 0.05);
-    const noise = (filterType, f, q, vol, wobble) => {
-      const src = c.createBufferSource();
-      src.buffer = this.noise;
-      src.loop = true;
-      const bq = c.createBiquadFilter();
-      bq.type = filterType;
-      bq.Q.value = q;
-      bq.frequency.setValueAtTime(f, t);
-      bq.frequency.linearRampToValueAtTime(f * 1.15, t + dur * 0.5);
-      bq.frequency.linearRampToValueAtTime(f * 0.8, end);
-      if (wobble) {
-        const lg = c.createGain();
-        lg.gain.value = wobble;
-        lfo.connect(lg).connect(bq.frequency);
-      }
-      const g = c.createGain();
-      g.gain.value = vol;
-      src.connect(bq).connect(g).connect(out);
-      src.start(t, Math.random() * 0.5);
-      src.stop(end + 0.05);
-    };
-    noise('lowpass', 520, 0.8, 1.2, 60);     // ronco grave do motor
-    noise('bandpass', 1500, 1.1, 0.7, 180);  // sopro do jato
-    // assobio da turbina, firme durante o voo e descendo no pouso
-    for (const [type, f, vol] of [['sawtooth', 1150, 0.045], ['triangle', 1720, 0.05]]) {
-      const o = c.createOscillator();
-      o.type = type;
-      o.frequency.setValueAtTime(f, t);
-      o.frequency.linearRampToValueAtTime(f * 1.04, t + dur * 0.5);
-      o.frequency.linearRampToValueAtTime(f * 0.8, end);
-      const bq = c.createBiquadFilter();
-      bq.type = 'bandpass';
-      bq.frequency.value = f;
-      bq.Q.value = 1.4;
-      const g = c.createGain();
-      g.gain.value = vol;
-      o.connect(bq).connect(g).connect(out);
-      o.start(t);
-      o.stop(end + 0.05);
-    }
-    // grave do motor
-    const sub = c.createOscillator();
-    sub.type = 'sine';
-    sub.frequency.setValueAtTime(62, t);
-    sub.frequency.linearRampToValueAtTime(52, end);
-    const sg = c.createGain();
-    sg.gain.value = 0.3;
-    sub.connect(sg).connect(out);
-    sub.start(t);
-    sub.stop(end + 0.05);
-  }
-
   makeNoise() {
     const len = this.ctx.sampleRate;
     const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
@@ -622,7 +538,8 @@ class SoundEngine {
         this.tone({ f: 1760, type: 'square', t, dur: 0.04, vol: 0.12 });
         break;
       case 'plane':
-        this.jet(t, 2.4, 0);
+        this.burst({ t, dur: 1.2, vol: 0.35, fq: 300, fq2: 2500, q: 2 });
+        this.tone({ f: 220, f2: 440, type: 'sawtooth', t, dur: 1.2, vol: 0.05 });
         break;
       case 'vs':
         this.tone({ f: 80, f2: 35, type: 'sine', t, dur: 1.2, vol: 1 });

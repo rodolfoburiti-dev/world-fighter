@@ -354,28 +354,22 @@ export class SelectScene extends Phaser.Scene {
     this.time.delayedCall(500, hop);
   }
 
-  // Avião do país de um lutador até o do outro (como no Street Fighter II), com o som do jato o voo inteiro.
-  // Lutadores do mesmo país: o avião decola, dá uma volta e pousa no mesmo lugar.
   flyPlane(fromCountry, toCountry, done) {
     const a = mapPoint(fromCountry), b = mapPoint(toCountry);
-    const V = Phaser.Math.Vector2;
-    const dist = Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y);
-    let curve;
-    if (dist < 30) {
-      curve = new Phaser.Curves.CubicBezier(new V(a.x, a.y), new V(a.x - 70, a.y - 95), new V(a.x + 70, a.y - 95), new V(b.x, b.y));
-    } else {
-      const lift = Math.max(60, dist * 0.35);
-      curve = new Phaser.Curves.QuadraticBezier(new V(a.x, a.y), new V((a.x + b.x) / 2, Math.min(a.y, b.y) - lift), new V(b.x, b.y));
-    }
-    const ms = 1400;
+    const lift = Math.max(50, Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y) * 0.35);
+    const curve = new Phaser.Curves.QuadraticBezier(
+      new Phaser.Math.Vector2(a.x, a.y),
+      new Phaser.Math.Vector2((a.x + b.x) / 2, Math.min(a.y, b.y) - lift),
+      new Phaser.Math.Vector2(b.x, b.y),
+    );
     const trail = this.add.graphics().setDepth(3.2);
     const plane = this.add.text(a.x, a.y, '✈', { fontFamily: 'sans-serif', fontSize: '26px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
       .setOrigin(0.5).setDepth(3.4);
-    Sound.plane(dist < 30 ? 0 : Math.sign(b.x - a.x), ms / 1000 + 0.2); // o som acompanha o voo do começo ao pouso
+    Sound.sfx('plane');
     const state = { t: 0 };
     let lastDot = 0;
     this.tweens.add({
-      targets: state, t: 1, duration: ms, ease: 'Sine.easeInOut',
+      targets: state, t: 1, duration: 1400, ease: 'Sine.easeInOut',
       onUpdate: () => {
         const pt = curve.getPoint(state.t);
         const tan = curve.getTangent(state.t);
