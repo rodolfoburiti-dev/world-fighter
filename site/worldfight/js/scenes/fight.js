@@ -576,7 +576,12 @@ export class FightScene extends Phaser.Scene {
             tp = (this.time.now - this.finale.poseAt) / 1000;
             if (tp < 0) return loop('idle', 110);
           }
-          return `win_${Math.min(m.anims.win.frames - 1, Math.floor(tp * WIN_POSE_FPS))}`;
+          const n = m.anims.win.frames;
+          const k = Math.floor(tp * (this.defs[f.index].winFps || WIN_POSE_FPS)); // winFps: ritmo próprio (ex.: dança)
+          // winLoop (data.js): comemoração que repete a partir desse quadro, ex.: a dancinha do Trumpete
+          const from = this.defs[f.index].winLoop;
+          if (from != null && k >= n) return `win_${from + ((k - from) % (n - from))}`;
+          return `win_${Math.min(n - 1, k)}`;
         }
         return loop('idle', 110);
       case 'walk': return loop(f.vx * f.face >= 0 ? 'walkf' : 'walkb', 80);

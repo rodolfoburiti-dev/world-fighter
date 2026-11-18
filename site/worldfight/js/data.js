@@ -2,7 +2,7 @@
 export const FIGHTERS = [
   { id: 'lula', name: 'MOLUSCULO', country: 'br', winVoice: true }, // vitória: "Faz o L, meu filho!" (voice/win-lula.mp3)
   { id: 'milei', name: 'MILEÃO', country: 'ar' },
-  { id: 'trump', name: 'TRUMPETE', country: 'us' },
+  { id: 'trump', name: 'TRUMPETE', country: 'us', winVoice: true, winLoop: 1, winFps: 5 }, // vitória: a dancinha (quadros 1+ em loop), "Eu sou o dono do mundo, man!"
   { id: 'pena', name: 'PEÑITA', country: 'py' },
   { id: 'xi', name: 'XI PING PONG', country: 'cn' },
   { id: 'putin', name: 'CZAR VLAD', country: 'ru' },
