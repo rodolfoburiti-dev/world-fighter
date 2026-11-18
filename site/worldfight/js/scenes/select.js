@@ -1,6 +1,6 @@
 import { Sound } from '../audio.js';
 import { bindControls } from '../controls.js';
-import { ALL_FIGHTERS, COUNTRIES, FONT, H, MAP_SRC_W, W, arcadeText, roster } from '../data.js';
+import { ALL_FIGHTERS, BOSS, COUNTRIES, FIGHTERS, FONT, H, MAP_SRC_W, W, arcadeText, roster } from '../data.js';
 import { Net } from '../net.js';
 import { addMuteToggle, addScanlines, say, showNetLost } from '../ui.js';
 
@@ -31,6 +31,7 @@ export class SelectScene extends Phaser.Scene {
     this.online = this.mode === 'online';
     this.locked = false;
     this.netLostShown = false;
+    this.bossTest = !!data.bossTest; // link de teste (?chefe): depois da escolha, luta direto contra o chefe
     this.roster = roster();
     const g = gridFor(this.roster.length);
     this.cols = g.cols;
@@ -344,7 +345,8 @@ export class SelectScene extends Phaser.Scene {
       }
       return;
     }
-    if (this.mode === 'arcade' && p1.confirmed && !p2.active) this.cpuRoulette();
+    if (this.mode === 'arcade' && p1.confirmed && !p2.active && this.bossTest) this.goBossTest();
+    else if (this.mode === 'arcade' && p1.confirmed && !p2.active) this.cpuRoulette();
     else if (p1.confirmed && p2.confirmed) this.goVersus();
   }
 
@@ -416,6 +418,19 @@ export class SelectScene extends Phaser.Scene {
         this.tweens.add({ targets: plane, scale: 1.6, alpha: 0, duration: 250 });
         done();
       },
+    });
+  }
+
+  // link de teste: vai para o desafio final como se já tivesse vencido todos os outros
+  goBossTest() {
+    this.locked = true;
+    const me = this.fighterOf(this.players[0]).id;
+    const beaten = FIGHTERS.filter((f) => f.id !== me).map((f) => f.id);
+    this.time.delayedCall(1100, () => {
+      Sound.stop(0.5);
+      this.cameras.main.fadeOut(400, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () =>
+        this.scene.start('versus', { mode: 'arcade', p1: me, p2: BOSS.id, ladder: { beaten } }));
     });
   }
 

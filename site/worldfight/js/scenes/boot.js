@@ -88,10 +88,16 @@ export class BootScene extends Phaser.Scene {
       this.time.delayedCall(800, () => {
         this.cameras.main.fadeOut(250, 0, 0, 0);
         // convite do jogo online (?sala=1234): vai direto para a sala
-        const sala = new URLSearchParams(location.search).get('sala');
-        if (sala) history.replaceState(null, '', location.pathname);
-        this.cameras.main.once('camerafadeoutcomplete', () => (
-          sala && /^\d{4}$/.test(sala) ? this.scene.start('online', { join: sala }) : this.scene.start('title')));
+        const params = new URLSearchParams(location.search);
+        const sala = params.get('sala');
+        // link de teste do chefe final (?chefe): escolhe o lutador e vai direto para a luta contra o Xandão
+        const chefe = params.has('chefe');
+        if (sala || chefe) history.replaceState(null, '', location.pathname);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+          if (sala && /^\d{4}$/.test(sala)) this.scene.start('online', { join: sala });
+          else if (chefe) this.scene.start('select', { mode: 'arcade', bossTest: true });
+          else this.scene.start('title');
+        });
       });
     };
     this.input.keyboard.on('keydown', insertCoin);
