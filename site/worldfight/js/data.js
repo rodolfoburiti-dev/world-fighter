@@ -7,7 +7,7 @@ export const FIGHTERS = [
   { id: 'xi', name: 'XI PING PONG', country: 'cn' },
   { id: 'putin', name: 'CZAR VLAD', country: 'ru' },
   { id: 'netanyahu', name: 'BIBIZÃO', country: 'il', size: 0.92, winVoice: true }, // 8% menor (desenhado agachado e corpulento); vitória: soco para o alto, "Que Deus proteja Israel"
-  { id: 'kim', name: 'KIM JONG BUM', country: 'kp' },
+  { id: 'kim', name: 'KIM JONG BUM', country: 'kp', winVoice: true, winLoop: 1, winFps: 5 }, // vitória: dancinha (loop), "Um botão nuclear está sempre na minha mesa"
   { id: 'flavio', name: 'BLOZINHO', country: 'br', winVoice: true }, // vitória: pose de sentido, "Sou o presidente do Brasil" (voice/win-flavio.mp3)
   { id: 'bolsonaro', name: 'BLOZO', country: 'br', winVoice: true }, // vitória: rasga a camiseta e grita (voice/win-bolsonaro.mp3)
 ];
