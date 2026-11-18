@@ -24,6 +24,10 @@ const byId = (id) => FIGHTERS.find((f) => f.id === id);
 const NET_DELAY = 4;
 const NET_STALL_MS = 400;   // parou esperando o outro lado por mais que isto: mostra "AGUARDANDO"
 const SYNC_EVERY = 120;     // a cada 2 s os dois lados conferem se a luta continua idêntica
+const WIN_POSE_FPS = 9;      // comemoração desenhada (ex.: o "L" do Molusculo): quadros por segundo
+// Fim da luta de quem tem comemoração própria: "K.O." → nome + "wins!" do locutor → comemoração com a fala
+// de vitória → tela de resultado. Tempos (ms) contados do fim do último round.
+const FINALE = { name: 1500, wins: 2600, pose: 3600, voice: 3900, result: 7400 };
 
 // Teclas por jogador. No modo Arcade o 1P aceita setas e WASD; no Versus cada um tem o seu lado.
 function keyMaps(mode) {
@@ -74,6 +78,8 @@ export class FightScene extends Phaser.Scene {
     this.matchOver = false;
     this.leaving = false;
     this.newRoundAt = null;
+    this.fadeAt = null;
+    this.finale = null;
     this.netLostShown = false;
     this.quitUi = null;
     this.restarting = false;
@@ -283,6 +289,7 @@ export class FightScene extends Phaser.Scene {
       steps++;
       this.handleEvents(this.sim.step(inputs));
       this.stepEffects();
+      if (this.fadeAt != null && this.sim.frame >= this.fadeAt) { this.fadeAt = null; this.cameras.main.fadeOut(220, 0, 0, 0); }
       if (this.newRoundAt != null && this.sim.frame >= this.newRoundAt) this.beginNextRound();
       if (this.online && this.sim.frame % SYNC_EVERY === 0) this.sendSync();
     }
@@ -317,11 +324,10 @@ export class FightScene extends Phaser.Scene {
     return i >= 0 && this.cache.audio.exists(`voice-win-${this.defs[i].id}`);
   }
 
-  winVoice(i) {
+  winVoice(i, delay = 1200) {
     if (!this.hasWinVoice(i)) return;
     const key = `win-${this.defs[i].id}`;
     this.stopAttackVoice();
-    const delay = 1200;
     const dur = this.cache.audio.get(`voice-${key}`)?.duration || 2.8;
     this.winVoiceUntil = this.time.now + delay + dur * 1000;
     say(this, key, delay);
@@ -393,11 +399,26 @@ export class FightScene extends Phaser.Scene {
       this.showBanner(e.winner < 0 ? 'EMPATE' : 'TEMPO!', { hold: 1500 });
       say(this, e.winner < 0 ? 'draw' : 'timeover');
     }
+    const w = e.winner;
+    const celebrates = w >= 0 && !!this.sprites[w].meta.anims.win;
+    // última luta de quem tem comemoração própria: anúncio do vencedor primeiro, a pose depois (ver FINALE)
+    if (celebrates && this.sim.fighters[w].wins >= 2) {
+      const now = this.time.now;
+      this.finale = { w, poseAt: now + FINALE.pose, resultAt: now + FINALE.result };
+      this.time.delayedCall(FINALE.name, () => this.showBanner(this.defs[w].name, { sub: 'VENCEU!', hold: FINALE.pose - FINALE.name - 300, scaleFrom: 2 }));
+      say(this, this.defs[w].id, FINALE.name);
+      say(this, 'wins', FINALE.wins);
+      if (e.perfect) this.time.delayedCall(FINALE.voice, () => this.showBanner('PERFEITO!', { color: '#ffffff', hold: 1500 }));
+      this.winVoice(w, FINALE.voice);
+      this.updateStars();
+      return;
+    }
+    this.finale = null;
     if (e.perfect) {
       this.time.delayedCall(1500, () => this.showBanner('PERFEITO!', { color: '#ffffff', hold: 1500 }));
-      if (!this.hasWinVoice(e.winner)) say(this, 'perfect', 1550); // com fala de vitória, só o letreiro
+      if (!this.hasWinVoice(w)) say(this, 'perfect', 1550); // com fala de vitória, só o letreiro
     }
-    this.winVoice(e.winner);
+    this.winVoice(w);
     this.updateStars();
   }
 
@@ -405,13 +426,14 @@ export class FightScene extends Phaser.Scene {
     const [a, b] = this.sim.fighters;
     if (a.wins >= 2 || b.wins >= 2) {
       this.matchOver = true;
-      this.time.delayedCall(500, () => this.showResult());
+      const wait = this.finale ? Math.max(500, this.finale.resultAt - this.time.now) : 500;
+      this.time.delayedCall(wait, () => this.showResult());
       return;
     }
     // o round novo começa num quadro fixo do motor (não no fim do escurecimento da tela, que varia de
     // aparelho para aparelho): assim, no online, os dois lados reiniciam exatamente no mesmo quadro
-    this.cameras.main.fadeOut(220, 0, 0, 0);
-    this.newRoundAt = this.sim.frame + 14;
+    this.fadeAt = this.sim.frame;
+    this.newRoundAt = this.fadeAt + 14;
   }
 
   beginNextRound() {
@@ -545,7 +567,15 @@ export class FightScene extends Phaser.Scene {
     switch (f.state) {
       case 'idle': return loop('idle', 110);
       case 'win': // comemoração própria (ex.: o "L" do Molusculo): toca uma vez e segura o último quadro
-        if (m.anims.win) return `win_${Math.min(m.anims.win.frames - 1, Math.floor(t * 9))}`;
+        if (m.anims.win) {
+          // fim da luta: espera o anúncio do vencedor ("Molusculo… wins!") parado na guarda, depois comemora
+          let tp = t;
+          if (this.finale && this.finale.w === f.index) {
+            tp = (this.time.now - this.finale.poseAt) / 1000;
+            if (tp < 0) return loop('idle', 110);
+          }
+          return `win_${Math.min(m.anims.win.frames - 1, Math.floor(tp * WIN_POSE_FPS))}`;
+        }
         return loop('idle', 110);
       case 'walk': return loop(f.vx * f.face >= 0 ? 'walkf' : 'walkb', 80);
       case 'crouch': return `crouch_${Math.min(m.anims.crouch.low, Math.floor(t * 40))}`;
@@ -769,8 +799,10 @@ export class FightScene extends Phaser.Scene {
       items.push({ label: 'SAIR', run: () => this.quitOnline() });
     } else {
       title = `${w.name} VENCEU!`;
-      say(this, w.id, this.afterWinVoice(300));
-      say(this, 'wins', this.afterWinVoice(1250));
+      if (!this.finale) { // com a comemoração, o nome e o "wins!" já foram anunciados
+        say(this, w.id, this.afterWinVoice(300));
+        say(this, 'wins', this.afterWinVoice(1250));
+      }
       sub = `JOGADOR ${winner + 1}`;
       items.push({ label: 'REVANCHE', run: () => this.leave('versus', { mode: this.mode, p1: this.defs[0].id, p2: this.defs[1].id }) });
       items.push({ label: 'ESCOLHER LUTADORES', run: () => this.leave('select', { mode: this.mode }) });
