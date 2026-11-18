@@ -1,23 +1,19 @@
 import { Sound } from '../audio.js';
 import { bindControls } from '../controls.js';
-import { COUNTRIES, FIGHTERS, FONT, H, MAP_SRC_W, W, arcadeText } from '../data.js';
+import { ALL_FIGHTERS, COUNTRIES, FONT, H, MAP_SRC_W, W, arcadeText, roster } from '../data.js';
 import { Net } from '../net.js';
 import { addMuteToggle, addScanlines, say, showNetLost } from '../ui.js';
 
-const COLS = 5;
-const TILE_W = 128, TILE_H = 116, GAP = 6;
-const GRID_X = W / 2 - (COLS * TILE_W + (COLS - 1) * GAP) / 2;
+const GAP = 6;
 const GRID_Y = 404;
+// grade: 5x2 com os 10 lutadores; 6x2 (miniaturas menores) quando o Xandão está desbloqueado
+const gridFor = (n) => (n > 10 ? { cols: 6, tw: 116, th: 105 } : { cols: 5, tw: 128, th: 116 });
 const MAP = { x: W / 2, y: 214, w: 560, h: 280 };
 const MAP_SRC_H = MAP_SRC_W / 2;
 const PORTRAIT_H = 470, PORTRAIT_MAX_W = 560, PORTRAIT_BOTTOM = 608;
 const TIME_LIMIT = 30;
 const COLORS = { p1: 0xff3030, p2: 0x2f8bff, cpu: 0xe0e0e0 };
 
-const tileCenter = (i) => ({
-  x: GRID_X + (i % COLS) * (TILE_W + GAP) + TILE_W / 2,
-  y: GRID_Y + Math.floor(i / COLS) * (TILE_H + GAP) + TILE_H / 2,
-});
 const mapPoint = (country) => ({
   x: MAP.x - MAP.w / 2 + COUNTRIES[country].x * (MAP.w / MAP_SRC_W),
   y: MAP.y - MAP.h / 2 + COUNTRIES[country].y * (MAP.h / MAP_SRC_H),
@@ -35,6 +31,12 @@ export class SelectScene extends Phaser.Scene {
     this.online = this.mode === 'online';
     this.locked = false;
     this.netLostShown = false;
+    this.roster = roster();
+    const g = gridFor(this.roster.length);
+    this.cols = g.cols;
+    this.tw = g.tw;
+    this.th = g.th;
+    this.gridX = W / 2 - (g.cols * g.tw + (g.cols - 1) * GAP) / 2;
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
     const bg = this.add.graphics();
@@ -42,7 +44,7 @@ export class SelectScene extends Phaser.Scene {
 
     this.players = [
       { id: 0, cursor: 0, confirmed: false, active: true, cpu: false, color: COLORS.p1, tag: '1P' },
-      { id: 1, cursor: 4, confirmed: false, active: this.mode !== 'arcade', cpu: false, color: COLORS.p2, tag: '2P' },
+      { id: 1, cursor: 4, confirmed: false, active: this.mode !== 'arcade', cpu: false, color: COLORS.p2, tag: '2P', ghostId: null },
     ];
     // online: cada aparelho controla só o seu lado (1P quem criou a sala, 2P quem entrou)
     this.me = this.online ? this.players[Net.side] : this.players[0];
@@ -72,9 +74,9 @@ export class SelectScene extends Phaser.Scene {
     for (const p of this.players) {
       const right = p.id === 1;
       p.baseX = right ? W : 0;
-      p.portrait = this.add.image(p.baseX, PORTRAIT_BOTTOM, `portrait-${FIGHTERS[0].id}`)
+      p.portrait = this.add.image(p.baseX, PORTRAIT_BOTTOM, `portrait-${this.roster[0].id}`)
         .setOrigin(right ? 1 : 0, 1).setFlipX(right).setVisible(false).setDepth(1);
-      p.flash = this.add.image(p.baseX, PORTRAIT_BOTTOM, `portrait-${FIGHTERS[0].id}`)
+      p.flash = this.add.image(p.baseX, PORTRAIT_BOTTOM, `portrait-${this.roster[0].id}`)
         .setOrigin(right ? 1 : 0, 1).setFlipX(right).setAlpha(0).setDepth(1.5)
         .setBlendMode(Phaser.BlendModes.ADD);
     }
@@ -94,15 +96,28 @@ export class SelectScene extends Phaser.Scene {
   }
 
   buildGrid() {
-    this.tiles = FIGHTERS.map((f, i) => {
-      const { x, y } = tileCenter(i);
-      this.add.rectangle(x, y, TILE_W + 6, TILE_H + 6, 0x000000).setDepth(3);
-      const img = this.add.image(x, y, `tile-${f.id}`).setDisplaySize(TILE_W, TILE_H).setDepth(3)
+    const { tw, th } = this;
+    this.tiles = this.roster.map((f, i) => {
+      const { x, y } = this.tileCenter(i);
+      this.add.rectangle(x, y, tw + 6, th + 6, 0x000000).setDepth(3);
+      const img = this.add.image(x, y, `tile-${f.id}`).setDisplaySize(tw, th).setDepth(3)
         .setInteractive({ useHandCursor: true }).on('pointerdown', () => this.tapTile(i));
-      this.add.rectangle(x, y, TILE_W + 2, TILE_H + 2).setStrokeStyle(2, 0x8a93c8).setDepth(3);
-      const flash = this.add.rectangle(x, y, TILE_W, TILE_H, 0xffffff).setAlpha(0).setDepth(3.5);
+      this.add.rectangle(x, y, tw + 2, th + 2).setStrokeStyle(2, f.boss ? 0xff3b2f : 0x8a93c8).setDepth(3);
+      const flash = this.add.rectangle(x, y, tw, th, 0xffffff).setAlpha(0).setDepth(3.5);
       return { img, flash };
     });
+  }
+
+  tileCenter(i) {
+    return {
+      x: this.gridX + (i % this.cols) * (this.tw + GAP) + this.tw / 2,
+      y: GRID_Y + Math.floor(i / this.cols) * (this.th + GAP) + this.th / 2,
+    };
+  }
+
+  // lutador sob o cursor (online: o do outro pode ser o Xandão mesmo que aqui ele não esteja liberado)
+  fighterOf(p) {
+    return p.ghostId ? ALL_FIGHTERS.find((f) => f.id === p.ghostId) : this.roster[p.cursor];
   }
 
   buildHud() {
@@ -158,18 +173,22 @@ export class SelectScene extends Phaser.Scene {
   }
 
   drawCursor(p) {
-    const { x, y } = tileCenter(p.cursor);
+    const { tw, th } = this;
+    p.cursorGfx.clear();
+    p.cursorLabel.setVisible(!p.ghostId && p.cursorGfx.visible);
+    if (p.ghostId) return; // lutador que não está na grade deste aparelho: sem cursor, só retrato e nome
+    const { x, y } = this.tileCenter(p.cursor);
     const other = this.players[1 - p.id];
-    const shared = other.active && other.cursor === p.cursor;
+    const shared = other.active && !other.ghostId && other.cursor === p.cursor;
     const inset = shared && p.id === 1 ? 7 : 0;
-    p.cursorGfx.clear().lineStyle(5, p.color, 1)
-      .strokeRect(x - TILE_W / 2 - 4 + inset, y - TILE_H / 2 - 4 + inset, TILE_W + 8 - inset * 2, TILE_H + 8 - inset * 2);
-    if (p.id === 0) p.cursorLabel.setOrigin(0, 1).setPosition(x - TILE_W / 2 - 4, y - TILE_H / 2 - 6);
-    else p.cursorLabel.setOrigin(1, 0).setPosition(x + TILE_W / 2 + 4, y + TILE_H / 2 + 6);
+    p.cursorGfx.lineStyle(5, p.color, 1)
+      .strokeRect(x - tw / 2 - 4 + inset, y - th / 2 - 4 + inset, tw + 8 - inset * 2, th + 8 - inset * 2);
+    if (p.id === 0) p.cursorLabel.setOrigin(0, 1).setPosition(x - tw / 2 - 4, y - th / 2 - 6);
+    else p.cursorLabel.setOrigin(1, 0).setPosition(x + tw / 2 + 4, y + th / 2 + 6);
   }
 
   refresh(p, animate = true) {
-    const f = FIGHTERS[p.cursor];
+    const f = this.fighterOf(p);
     this.drawCursor(p);
     const other = this.players[1 - p.id];
     if (other.active) this.drawCursor(other);
@@ -188,7 +207,7 @@ export class SelectScene extends Phaser.Scene {
 
     p.nameText.setText(f.name).setFontSize(24);
     // nomes longos não podem invadir a grade de miniaturas: diminui a letra até caber
-    for (let size = 23; p.nameText.width > GRID_X - 40 && size >= 14; size--) p.nameText.setFontSize(size);
+    for (let size = 23; p.nameText.width > this.gridX - 40 && size >= 14; size--) p.nameText.setFontSize(size);
     p.countryText.setText(COUNTRIES[f.country].name);
     p.tagText.setText(this.online ? `${p.tag} · ${p === this.me ? 'VOCÊ' : 'OPONENTE'}` : p.tag).setColor(hex(p.color)).setVisible(true);
 
@@ -217,15 +236,21 @@ export class SelectScene extends Phaser.Scene {
     if (!p || p.confirmed) return;
     if (p.cursor === i) return this.confirm(p);
     p.cursor = i;
+    p.ghostId = null;
     Sound.sfx('cursor');
     this.refresh(p);
     this.sendCursor(p);
   }
 
   move(p, dx, dy) {
-    const col = (p.cursor % COLS + dx + COLS) % COLS;
-    const row = (Math.floor(p.cursor / COLS) + dy + 2) % 2;
-    p.cursor = row * COLS + col;
+    const cols = this.cols;
+    const n = this.roster.length;
+    const col = (p.cursor % cols + dx + cols) % cols;
+    const row = (Math.floor(p.cursor / cols) + dy + 2) % 2;
+    let i = row * cols + col;
+    if (i >= n) i = dx ? row * cols + (dx > 0 ? 0 : (n - 1) % cols) : n - 1; // casa vazia da grade 6x2
+    p.cursor = Math.min(i, n - 1);
+    p.ghostId = null;
     Sound.sfx('cursor');
     this.refresh(p);
     this.sendCursor(p);
@@ -233,16 +258,16 @@ export class SelectScene extends Phaser.Scene {
 
   // ---- online: o cursor e a escolha do outro jogador chegam pela rede --------------------------
   sendCursor(p) {
-    if (this.online && p === this.me) Net.send({ t: 'cursor', i: p.cursor });
+    if (this.online && p === this.me) Net.send({ t: 'cursor', id: this.fighterOf(p).id });
   }
 
   onNet(d) {
     const other = this.players[1 - Net.side];
     if (d.t === 'cursor' && !other.confirmed) {
-      other.cursor = d.i;
+      this.placeRemote(other, d.id);
       this.refresh(other);
     } else if (d.t === 'pick') {
-      other.cursor = d.i;
+      this.placeRemote(other, d.id);
       this.refresh(other);
       this.confirm(other);
     } else if (d.t === 'unpick' && other.confirmed) {
@@ -251,6 +276,13 @@ export class SelectScene extends Phaser.Scene {
     } else if (d.t === 'start') {
       this.startOnline(d);
     }
+  }
+
+  // o outro jogador escolheu pelo nome do lutador (as grades dos dois aparelhos podem ser diferentes)
+  placeRemote(p, id) {
+    const i = this.roster.findIndex((f) => f.id === id);
+    p.ghostId = i < 0 ? id : null;
+    if (i >= 0) p.cursor = i;
   }
 
   // o 1P (quem criou a sala) sorteia o cenário e a semente da luta; os dois lados usam os mesmos
@@ -288,7 +320,7 @@ export class SelectScene extends Phaser.Scene {
     if (p.confirmed) return;
     p.confirmed = true;
     Sound.sfx('confirm');
-    say(this, FIGHTERS[p.cursor].id, 120);
+    say(this, this.fighterOf(p).id, 120);
     this.stopBlink(p);
     this.cameras.main.shake(140, 0.006);
     const tile = this.tiles[p.cursor];
@@ -297,7 +329,7 @@ export class SelectScene extends Phaser.Scene {
     p.flash.setPosition(p.baseX, PORTRAIT_BOTTOM).setAlpha(1);
     this.tweens.add({ targets: p.flash, alpha: 0, duration: 450, ease: 'Quad.easeIn' });
     this.tweens.add({ targets: p.nameText, scale: 1.15, duration: 90, yoyo: true });
-    if (this.online && p === this.me) Net.send({ t: 'pick', i: p.cursor });
+    if (this.online && p === this.me) Net.send({ t: 'pick', id: this.fighterOf(p).id });
     this.afterConfirm();
   }
 
@@ -305,7 +337,7 @@ export class SelectScene extends Phaser.Scene {
     const [p1, p2] = this.players;
     if (this.online) {
       if (p1.confirmed && p2.confirmed && Net.isHost && !this.started) {
-        const d = { t: 'start', m: Net.match + 1, p1: FIGHTERS[p1.cursor].id, p2: FIGHTERS[p2.cursor].id,
+        const d = { t: 'start', m: Net.match + 1, p1: this.fighterOf(p1).id, p2: this.fighterOf(p2).id,
           seed: (Math.random() * 2 ** 31) >>> 0, stage: Math.random() < 0.5 ? 0 : 1 };
         Net.send(d);
         this.startOnline(d);
@@ -339,7 +371,7 @@ export class SelectScene extends Phaser.Scene {
     cpu.marker.destroy();
     cpu.marker = this.add.container(0, 0, [this.add.circle(0, 0, 5, COLORS.cpu)]).setDepth(3);
 
-    const pool = FIGHTERS.map((_, i) => i).filter((i) => i !== p1.cursor);
+    const pool = this.roster.map((_, i) => i).filter((i) => i !== p1.cursor && !this.roster[i].boss); // o chefe só no fim
     const target = Phaser.Utils.Array.GetRandom(pool);
     const hops = 16;
     let k = 0;
@@ -349,7 +381,7 @@ export class SelectScene extends Phaser.Scene {
       Sound.sfx('cursor');
       this.refresh(cpu, k === hops);
       if (k < hops) this.time.delayedCall(55 + k * k * 1.6, hop);
-      else this.time.delayedCall(350, () => this.flyPlane(FIGHTERS[p1.cursor].country, FIGHTERS[target].country, () => this.confirm(cpu)));
+      else this.time.delayedCall(350, () => this.flyPlane(this.fighterOf(p1).country, this.roster[target].country, () => this.confirm(cpu)));
     };
     this.time.delayedCall(500, hop);
   }
@@ -394,7 +426,7 @@ export class SelectScene extends Phaser.Scene {
       Sound.stop(0.5);
       this.cameras.main.fadeOut(400, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () =>
-        this.scene.start('versus', { mode: this.mode, p1: FIGHTERS[p1.cursor].id, p2: FIGHTERS[p2.cursor].id, ladder: { beaten: [] } }));
+        this.scene.start('versus', { mode: this.mode, p1: this.fighterOf(p1).id, p2: this.fighterOf(p2).id, ladder: { beaten: [] } }));
     });
   }
 }

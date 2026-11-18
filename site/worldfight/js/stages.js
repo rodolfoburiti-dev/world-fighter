@@ -5,7 +5,7 @@ export const GROUND_Y = 650;
 
 // Cenários com imagem. No Brasil o cenário é do lutador: Lula no Nordeste, Bolsonaro no Rio, Flávio em Brasília.
 export const STAGE_IMAGES = ['us', 'br', 'br-lula', 'br-rio', 'ar', 'il', 'py', 'cn', 'kp', 'ru'];
-const STAGE_BY_FIGHTER = { lula: 'br-lula', flavio: 'br', bolsonaro: 'br-rio' };
+const STAGE_BY_FIGHTER = { lula: 'br-lula', flavio: 'br', bolsonaro: 'br-rio', moraes: 'br' }; // chefe: Praça dos Três Poderes
 
 // Cenário da luta para o lutador "dono da casa".
 export const stageFor = (fighter) => STAGE_BY_FIGHTER[fighter.id] || fighter.country;

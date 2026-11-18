@@ -1,10 +1,10 @@
 import { Sound } from '../audio.js';
 import { bindControls } from '../controls.js';
-import { COUNTRIES, FIGHTERS, FONT, H, W, arcadeText } from '../data.js';
+import { ALL_FIGHTERS, COUNTRIES, FIGHTERS, FONT, H, W, arcadeText } from '../data.js';
 import { Net } from '../net.js';
 import { addMuteToggle, addScanlines, blink, say, showNetLost } from '../ui.js';
 
-const byId = (id) => FIGHTERS.find((f) => f.id === id);
+const byId = (id) => ALL_FIGHTERS.find((f) => f.id === id);
 
 // Tela "VS": os dois retratos entram pelas laterais e o VS bate no meio.
 export class VersusScene extends Phaser.Scene {

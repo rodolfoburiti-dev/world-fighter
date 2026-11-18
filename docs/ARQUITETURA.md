@@ -43,6 +43,15 @@ boot → title ─┬─ Arcade / Versus ─→ select → versus → fight → 
 
 Na cena de luta, o round seguinte começa num quadro fixo do motor (`newRoundAt`), e não quando o escurecimento da tela termina. O tempo de animação varia entre aparelhos e, no online, isso faria os dois lados se separarem.
 
+## Chefe final
+
+- **Dados:** `BOSS` em `js/data.js` (`XANDÃO`), fora da grade de seleção.
+- **Quando aparece:** no Arcade, depois de vencer todos os outros lutadores, o resultado oferece "DESAFIO FINAL".
+- **Força:** no motor, `power` (dano causado, ×1,35) e `armor` (dano recebido, ×0,75). A CPU dele joga no nível máximo.
+- **Entrada:** a abertura do 1º round é mais longa (`introFrames`). A animação `intro` mostra a descida voando de toga, a toga jogada fora e a queda no chão (`bossEntryPose` em `fight.js`).
+- **Desbloqueio:** vencer o chefe zera o jogo e grava `wf-xandao` no `localStorage`. Daí em diante, `roster()` coloca o XANDÃO na seleção, numa grade 6 × 2. Escolhido por um jogador, ele luta com força normal.
+- **Online:** os dois aparelhos trocam o id do lutador, e não a posição na grade. Assim funciona mesmo que só um dos lados tenha o XANDÃO liberado.
+
 ## CPU (`js/fight/ai.js`)
 
 Controla o adversário com os mesmos comandos de um jogador: o motor não distingue humano de máquina. A dificuldade sobe a cada adversário vencido no Arcade.

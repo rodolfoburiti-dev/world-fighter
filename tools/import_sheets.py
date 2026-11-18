@@ -47,7 +47,8 @@ AI_KO = set()    # ... com nocaute (quique) e levantada também desenhados pela 
 KO_BOUNCE = 4    # quadro do quique na tira de nocaute (0 = recuo do golpe ... 5 = esparramado)
 GUARD_FIRST = ("jab", "strong", "lowkick", "highkick", "special", "block", "crouch", "win")  # tiras que começam na guarda
 # opcionais: só entram se a pasta existir (win = comemoração de vitória própria do lutador, ex.: o "L" do Molusculo)
-AI_OPTIONAL = {"win": "win"}
+AI_OPTIONAL = {"win": "win", "intro": "intro"}  # intro = entrada do chefe final (voando de toga)
+AI_ONLY = ["moraes"]  # lutadores que só existem em tiras de IA (o chefe final)
 LYING_DIR = os.path.join(ROOT, "incoming", "deitado")  # <id>.png: o lutador deitado de costas (gerado por IA)
 FALL_ANGLES = [0, 14, 32, 52, 70]  # a guarda caindo de costas (graus; anti-horário = cabeça para trás)
 LAND_ANGLES = [8, 3, 0, 0, 0]      # já deitado: o tronco bate e assenta no chão
@@ -465,7 +466,7 @@ def frames_from_ai(fid):
             bx0, by0, bx1, by1 = im.getbbox()
             # âncora = onde fica o tronco na guarda: pelo calcanhar de trás (plantado) nos movimentos no chão;
             # no andar e no pulo, que não têm pé fixo, pelo próprio tronco
-            hx = torso_x(im) if anim in ("walkf", "jump") else heel_x(im) - heel_off
+            hx = torso_x(im) if anim in ("walkf", "jump", "intro") else heel_x(im) - heel_off
             crop = im.crop((bx0, by0, bx1, by1))
             crop = crop.resize((max(1, round(crop.width * k)), max(1, round(crop.height * k))), Image.LANCZOS)
             crop = Image.fromarray(hard_alpha(np.asarray(crop)), "RGBA")
@@ -683,6 +684,10 @@ def main():
               + "  ".join(f"{k}:{v.get('impact', '')}/{v.get('reach', '')}" for k, v in meta[fid]["anims"].items() if "impact" in v))
     meta["lula"], size = build_atlas("lula", frames_from_ai("lula") if ai_available("lula") else frames_from_lula())
     print(f"ok lula       páginas/kpx {size}  corpo {meta['lula']['bodyH']:.0f}px")
+    for fid in AI_ONLY:
+        if ai_available(fid):
+            meta[fid], size = build_atlas(fid, frames_from_ai(fid))
+            print(f"ok {fid:10} páginas/kpx {size}  corpo {meta[fid]['bodyH']:.0f}px (chefe)")
     with open(os.path.join(OUT, "meta.json"), "w", encoding="utf-8") as fh:
         json.dump(meta, fh, indent=1)
 

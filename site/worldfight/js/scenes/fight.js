@@ -1,7 +1,7 @@
 import { Sound } from '../audio.js';
 import { COMBAT_VOICES } from '../combat-voices.js';
 import { bindControls } from '../controls.js';
-import { COUNTRIES, FIGHTERS, FONT, H, ORB, W, arcadeText } from '../data.js';
+import { ALL_FIGHTERS, BOSS, COUNTRIES, FIGHTERS, FONT, H, ORB, W, arcadeText, bossUnlocked, unlockBoss } from '../data.js';
 import { CpuBrain } from '../fight/ai.js';
 import { ATTACKS, FPS, FightSim, GETUP_FRAMES, HP_MAX, INTRO_FRAMES } from '../fight/sim.js';
 import { GROUND_Y, addStage, stageFor } from '../stages.js';
@@ -18,7 +18,7 @@ const SPRITE_H = 300;
 const VOICE_GAP_MS = 2400;
 const FIGHTER_VOICE_GAP_MS = 5200;
 const hex = (n) => `#${n.toString(16).padStart(6, '0')}`;
-const byId = (id) => FIGHTERS.find((f) => f.id === id);
+const byId = (id) => ALL_FIGHTERS.find((f) => f.id === id);
 // Online: atraso de entrada (quadros). Cada comando vale NET_DELAY quadros depois de apertado — tempo para
 // chegar ao outro lado sem a luta parar. 4 quadros = 67 ms, imperceptível para a maioria das pessoas.
 const NET_DELAY = 4;
@@ -27,6 +27,9 @@ const SYNC_EVERY = 120;     // a cada 2 s os dois lados conferem se a luta conti
 const WIN_POSE_FPS = 9;      // comemoração desenhada (ex.: o "L" do Molusculo): quadros por segundo
 // Fim da luta de quem tem comemoração própria: "K.O." → nome + "wins!" do locutor → comemoração com a fala
 // de vitória → tela de resultado. Tempos (ms) contados do fim do último round.
+// Entrada do chefe final (quadros do motor, 60 por segundo): desce voando de toga, joga a toga fora e cai no chão.
+const BOSS_INTRO = 330;
+const BOSS_ENTRY = { fly: 96, grab: 132, toss: 156, land: 168, rise: 200, done: 222 };
 const FINALE = { name: 1500, wins: 2600, pose: 3600, voice: 3900, result: 7400 };
 
 // Teclas por jogador. No modo Arcade o 1P aceita setas e WASD; no Versus cada um tem o seu lado.
@@ -101,8 +104,14 @@ export class FightScene extends Phaser.Scene {
     this.projSprites = new Map();
 
     const seed = this.online ? data.seed >>> 0 : (Date.now() ^ (Math.random() * 1e9)) >>> 0;
-    this.sim = new FightSim({ seed });
-    this.ai = this.mode === 'arcade' ? new CpuBrain(1, Math.min(0.9, 0.15 + 0.09 * this.ladder.beaten.length)) : null;
+    // chefe final: mais forte, aguenta mais e tem abertura longa para a entrada voando (só no Arcade)
+    // (o Xandão escolhido por um jogador, depois de desbloqueado, luta com força normal)
+    this.bossIdx = this.mode === 'arcade' && this.defs[1].boss ? 1 : -1;
+    this.bossLanded = false;
+    this.sim = this.bossIdx < 0 ? new FightSim({ seed }) : new FightSim({
+      seed, power: [1, BOSS.power], armor: [1, BOSS.armor], introFrames: BOSS_INTRO,
+    });
+    this.ai = this.mode === 'arcade' ? new CpuBrain(1, this.bossIdx === 1 ? 1 : Math.min(0.9, 0.15 + 0.09 * this.ladder.beaten.length)) : null;
 
     this.setupInput();
     if (this.online) this.setupNet();
@@ -455,14 +464,54 @@ export class FightScene extends Phaser.Scene {
     const n = a.wins + b.wins + 1;
     this.updateStars();
     const final = a.wins === 1 && b.wins === 1;
-    this.time.delayedCall(350, () => this.showBanner(final ? 'ROUND FINAL' : `ROUND ${n}`, { hold: 1300 }));
-    say(this, final ? 'roundfinal' : `round${n}`, 380);
-    const fightAt = (INTRO_FRAMES / FPS) * 1000 - 700;
+    // 1º round contra o chefe: o anúncio do round espera a entrada voando terminar
+    const entry = this.bossIdx >= 0 && n === 1;
+    const intro = entry ? BOSS_INTRO : INTRO_FRAMES;
+    const roundAt = entry ? (BOSS_ENTRY.done / FPS) * 1000 + 150 : 350;
+    if (entry) this.bossEntryStart();
+    this.time.delayedCall(roundAt, () => this.showBanner(final ? 'ROUND FINAL' : `ROUND ${n}`, { hold: 1300 }));
+    say(this, final ? 'roundfinal' : `round${n}`, roundAt + 30);
+    const fightAt = (intro / FPS) * 1000 - 700;
     this.time.delayedCall(fightAt, () => {
       say(this, 'fight');
       this.nextVoiceAt = Math.max(this.nextVoiceAt || 0, this.time.now + 1200); // fala de combate só depois do "Fight!"
       this.showBanner('LUTEM!', { color: '#ffffff', hold: 900, scaleFrom: 3 });
     });
+  }
+
+  // ---- chefe final: entrada voando ---------------------------------------------------------------
+  bossEntryStart() {
+    if (!this.sprites[this.bossIdx].meta.anims.intro) return;
+    Sound.sfx('whoosh');
+    this.showBanner('DESAFIO FINAL', { color: '#ff3b2f', hold: 1500, scaleFrom: 1.6 });
+  }
+
+  // quadro e altura do chefe durante a entrada do 1º round (null = já está lutando normalmente)
+  bossEntryPose(s) {
+    const m = this.sprites[this.bossIdx].meta.anims.intro;
+    if (!m || s.frame > BOSS_ENTRY.done || s.fighters[0].wins + s.fighters[1].wins > 0) return null;
+    const k = s.frame;
+    const E = BOSS_ENTRY;
+    const hover = -95;
+    if (k < E.fly) { // desce voando, a toga balançando
+      const p = k / E.fly;
+      return { frame: `intro_${Math.floor(k / 8) % 2}`, dy: -560 + (560 + hover) * (1 - (1 - p) * (1 - p)) };
+    }
+    if (k < E.grab) return { frame: 'intro_2', dy: hover };
+    if (k < E.toss) return { frame: 'intro_3', dy: hover };
+    if (k < E.land) { // cai no chão
+      const p = (k - E.toss) / (E.land - E.toss);
+      return { frame: 'intro_3', dy: hover * (1 - p * p) };
+    }
+    if (!this.bossLanded) {
+      this.bossLanded = true;
+      Sound.sfx('slam');
+      say(this, 'boss-moraes', 250);
+      this.cameras.main.shake(320, 0.016);
+      this.dust(s.fighters[this.bossIdx].x, 12);
+    }
+    if (k < E.rise) return { frame: 'intro_4', dy: 0 };
+    return { frame: `intro_${Math.min(m.frames - 1, 5)}`, dy: 0 };
   }
 
   showBanner(text, { color = '#ffd63a', hold = 1200, scaleFrom = 2.4, sub = '' } = {}) {
@@ -534,7 +583,9 @@ export class FightScene extends Phaser.Scene {
       const t = (s.frame - v.f0) / FPS;
       const spr = this.sprites[i];
       const pose = this.pose(f, v, t, time, s.frame, spr.bodyHalf);
-      const frameName = this.frameFor(f, spr.meta, t, time);
+      let frameName = this.frameFor(f, spr.meta, t, time);
+      const entry = i === this.bossIdx ? this.bossEntryPose(s) : null;
+      if (entry) { frameName = entry.frame; pose.dy += entry.dy; }
       if (spr.frame.name !== frameName) spr.setFrame(frameName);
       // corpo batendo no chão: no quadro "bate" da queda desenhada (o anterior ao quique)
       const ko = spr.meta.anims.ko;
@@ -774,18 +825,29 @@ export class FightScene extends Phaser.Scene {
     const items = [];
     let title;
     let sub;
-    if (arcade && winner === 0) {
+    if (arcade && winner === 0 && this.defs[1].boss) {
+      // venceu o chefe final: zerou o jogo e libera o Xandão (guardado no navegador)
+      const novo = !bossUnlocked();
+      unlockBoss();
+      title = 'VOCÊ ZEROU O JOGO!';
+      say(this, 'champion', this.afterWinVoice(300));
+      sub = novo ? 'XANDÃO DESBLOQUEADO! AGORA ELE APARECE NA SELEÇÃO' : `${w.name} DERROTOU O CHEFE FINAL · CAMPEÃO DO WORLD FIGHTER`;
+      items.push({ label: 'VOLTAR AO MENU', run: () => this.leave('title') });
+      this.celebrate();
+    } else if (arcade && winner === 0) {
       this.ladder.beaten.push(this.defs[1].id);
-      const remaining = FIGHTERS.filter((f) => f.id !== this.defs[0].id && !this.ladder.beaten.includes(f.id));
+      const rivals = FIGHTERS.filter((f) => f.id !== this.defs[0].id);
+      const remaining = rivals.filter((f) => !this.ladder.beaten.includes(f.id));
       if (remaining.length === 0) {
-        title = 'CAMPEÃO!';
-        say(this, 'champion', this.afterWinVoice(300));
-        sub = `${w.name} DERROTOU TODOS OS LUTADORES`;
-        items.push({ label: 'VOLTAR AO MENU', run: () => this.leave('title') });
+        // venceu todos: falta o chefe final
+        title = 'VOCÊ VENCEU TODOS!';
+        say(this, 'youwin', this.afterWinVoice(300));
+        sub = 'MAS AINDA FALTA O CHEFE FINAL...';
+        items.push({ label: 'DESAFIO FINAL', run: () => this.leave('versus', { mode: this.mode, p1: this.defs[0].id, p2: BOSS.id, ladder: this.ladder }) });
       } else {
         title = 'VOCÊ VENCEU!';
         say(this, 'youwin', this.afterWinVoice(300));
-        sub = `${this.ladder.beaten.length} DE ${FIGHTERS.length - 1} ADVERSÁRIOS`;
+        sub = `${this.ladder.beaten.length} DE ${rivals.length} ADVERSÁRIOS`;
         const next = Phaser.Utils.Array.GetRandom(remaining);
         items.push({ label: 'PRÓXIMA LUTA', run: () => this.leave('versus', { mode: this.mode, p1: this.defs[0].id, p2: next.id, ladder: this.ladder }) });
         items.push({ label: 'ESCOLHER LUTADOR', run: () => this.leave('select', { mode: this.mode }) });
@@ -827,6 +889,24 @@ export class FightScene extends Phaser.Scene {
     });
     this.paintMenu();
     Sound.sfx((this.online ? winner === this.side : winner === 0 || !arcade) ? 'start' : 'cancel');
+  }
+
+  // zerou o jogo: fogos de artifício na tela de resultado
+  celebrate() {
+    const colors = [0xffd63a, 0xff3b2f, 0x2f8bff, 0x7fe08a, 0xffffff];
+    const burst = () => {
+      if (!this.scene.isActive()) return;
+      const x = 160 + Math.random() * (W - 320);
+      const y = 90 + Math.random() * 220;
+      const c = Phaser.Utils.Array.GetRandom(colors);
+      for (let i = 0; i < 18; i++) {
+        const a = (Math.PI * 2 * i) / 18;
+        const dot = this.add.circle(x, y, 4, c).setDepth(95).setBlendMode(Phaser.BlendModes.ADD);
+        this.tweens.add({ targets: dot, x: x + Math.cos(a) * 110, y: y + Math.sin(a) * 110 + 30, alpha: 0, duration: 900, ease: 'Quad.easeOut', onComplete: () => dot.destroy() });
+      }
+      Sound.sfx('boom');
+    };
+    for (let k = 0; k < 8; k++) this.time.delayedCall(300 + k * 550, burst);
   }
 
   paintMenu() {

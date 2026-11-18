@@ -64,8 +64,13 @@ function makeFighter(index) {
 }
 
 export class FightSim {
-  constructor({ seed = 1 } = {}) {
+  // power: multiplica o dano que cada lado causa; armor: multiplica o dano que cada lado recebe
+  // (o chefe final bate mais forte e aguenta mais). introFrames: abertura do 1º round (entrada do chefe).
+  constructor({ seed = 1, power = [1, 1], armor = [1, 1], introFrames = INTRO_FRAMES } = {}) {
     this.rand = mulberry32(seed);
+    this.power = power;
+    this.armor = armor;
+    this.introFirst = introFrames;
     this.wins = [0, 0];
     this.frame = 0;
     this.newRound();
@@ -100,7 +105,7 @@ export class FightSim {
     this.resolveAttacks(b, a);
     this.updateProjectiles();
 
-    if (this.phase === 'intro' && this.phaseT >= INTRO_FRAMES) this.setPhase('fight');
+    if (this.phase === 'intro' && this.phaseT >= (this.frame <= this.introFirst + 1 ? this.introFirst : INTRO_FRAMES)) this.setPhase('fight');
     else if (this.phase === 'fight') {
       this.timer--;
       if (a.hp <= 0 || b.hp <= 0) this.endRound(a.hp <= 0 && b.hp <= 0 ? -1 : a.hp <= 0 ? 1 : 0, 'ko');
@@ -359,15 +364,16 @@ export class FightSim {
   applyHit(attacker, d, def, at, dirFace, kind) {
     const blocked = this.canBlock(d, def.low);
     const stop = def.stop;
+    const mul = DAMAGE_SCALE * this.power[1 - d.index] * this.armor[d.index];
     if (blocked) {
-      d.hp -= Math.max(1, Math.round(def.dmg * DAMAGE_SCALE * BLOCK_CHIP));
+      d.hp -= Math.max(1, Math.round(def.dmg * mul * BLOCK_CHIP));
       d.state = 'blockstun';
       d.stun = def.bs;
       d.vx = dirFace * def.kb * 0.7;
       d.atk = null;
       if (attacker) attacker.vx = attacker.y === 0 ? -dirFace * 1.5 : attacker.vx;
     } else {
-      d.hp -= Math.round(def.dmg * DAMAGE_SCALE);
+      d.hp -= Math.round(def.dmg * mul);
       d.atk = null;
       d.crouch = false;
       if (def.knockdown || d.hp <= 0) this.knockDown(d, dirFace);

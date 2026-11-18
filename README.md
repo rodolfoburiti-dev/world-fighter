@@ -12,11 +12,12 @@ Jogo de luta 2D para navegador no estilo dos fliperamas dos anos 90, com caricat
 
 - **10 lutadores de 8 países**, cada um com cenário e música próprios (os brasileiros têm cenário por lutador).
 - **Modos:**
-  - **Arcade:** escada contra os outros nove.
+  - **Arcade:** escada contra os outros nove e, no fim, o **chefe final XANDÃO**, que entra voando de toga, bate mais forte e aguenta mais. Quem vence o chefe zera o jogo e libera o XANDÃO na seleção (fica salvo no navegador).
   - **Versus:** dois jogadores no mesmo teclado ou com dois controles.
   - **Online:** contra um amigo em outro aparelho, por código de sala ou link de convite.
 - **Golpes:** jab, soco forte, chute alto, rasteira (derruba), golpes no ar, defesa e especial com bola de energia nas cores do país.
 - **Partidas:** melhor de 3 rounds de 99 segundos, com KO em câmera lenta, queda com quique, "PERFEITO" e revanche.
+- **Comemorações de vitória** próprias de cada lutador: o "L" do Molusculo, a camiseta rasgada do Blozo, a dancinha do Trumpete e outras, com fala.
 - **Celular e tablet:**
   - direcional analógico 360° flutuante e botões A/B/X/Y no estilo do controle do Xbox;
   - tela cheia automática;

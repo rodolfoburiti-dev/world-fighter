@@ -1,6 +1,6 @@
 import { Sound } from '../audio.js';
 import { COMBAT_VOICES } from '../combat-voices.js';
-import { FIGHTERS, FONT, W, H, arcadeText } from '../data.js';
+import { ALL_FIGHTERS, FIGHTERS, FONT, W, H, arcadeText } from '../data.js';
 import { STAGE_IMAGES } from '../stages.js';
 import { addScanlines, blink } from '../ui.js';
 
@@ -47,7 +47,7 @@ export class BootScene extends Phaser.Scene {
     this.load.setPath('assets/');
     this.load.image('title', v('title.webp'));
     this.load.image('map', v('map.webp'));
-    for (const f of FIGHTERS) {
+    for (const f of ALL_FIGHTERS) {
       this.load.image(`tile-${f.id}`, v(`tiles/${f.id}.webp`));
       this.load.image(`portrait-${f.id}`, v(`portraits/${f.id}.webp`));
       // as animações de luta (pesadas) são carregadas só na tela VS, para os dois lutadores da luta
@@ -59,7 +59,8 @@ export class BootScene extends Phaser.Scene {
       this.load.audio(`voice-${id}`, v(`voice/${id}.mp3`));
     }
     // fala de vitória própria de alguns lutadores (FIGHTERS[].winVoice)
-    for (const f of FIGHTERS.filter((x) => x.winVoice)) this.load.audio(`voice-win-${f.id}`, v(`voice/win-${f.id}.mp3`));
+    for (const f of ALL_FIGHTERS.filter((x) => x.winVoice)) this.load.audio(`voice-win-${f.id}`, v(`voice/win-${f.id}.mp3`));
+    this.load.audio('voice-boss-moraes', v('voice/boss-moraes.mp3')); // grito do Xandão ao cair no chão
     // anúncios da luta (inglês, como no fliperama), cada um com duas tomadas
     for (const id of ANNOUNCER) {
       this.load.audio(`voice-${id}`, v(`voice/${id}.mp3`));

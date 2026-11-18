@@ -659,5 +659,72 @@
    }
   },
   "alias": {}
+ },
+ "moraes": {
+  "originY": 0.9934426229508196,
+  "bodyH": 290.0,
+  "bodyW": 207.0,
+  "anims": {
+   "idle": {
+    "frames": 4
+   },
+   "walkf": {
+    "frames": 6
+   },
+   "crouch": {
+    "frames": 3,
+    "low": 2
+   },
+   "jab": {
+    "frames": 4,
+    "impact": 2,
+    "reach": 0.494,
+    "strength": 3.47
+   },
+   "strong": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.598,
+    "strength": 5.76
+   },
+   "lowkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.537,
+    "strength": 5.97
+   },
+   "highkick": {
+    "frames": 5,
+    "impact": 2,
+    "reach": 0.335,
+    "strength": 2.59
+   },
+   "jump": {
+    "frames": 5
+   },
+   "special": {
+    "frames": 5,
+    "impact": 3,
+    "reach": 0.457,
+    "strength": 3.84
+   },
+   "block": {
+    "frames": 3
+   },
+   "intro": {
+    "frames": 6
+   },
+   "walkb": {
+    "frames": 6
+   },
+   "ko": {
+    "frames": 6,
+    "bounce": 4
+   },
+   "getup": {
+    "frames": 4
+   }
+  },
+  "alias": {}
  }
 }

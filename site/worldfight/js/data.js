@@ -12,6 +12,22 @@ export const FIGHTERS = [
   { id: 'bolsonaro', name: 'BLOZO', country: 'br', winVoice: true }, // vitória: rasga a camiseta e grita (voice/win-bolsonaro.mp3)
 ];
 
+// Chefe final do Arcade: só aparece depois de vencer os outros nove (não está na grade de seleção).
+// Entra voando com a toga, joga a toga fora e cai no chão; bate mais forte (power) e aguenta mais (armor).
+export const BOSS = { id: 'moraes', name: 'XANDÃO', country: 'br', boss: true, power: 1.35, armor: 0.75, winVoice: true };
+export const ALL_FIGHTERS = [...FIGHTERS, BOSS];
+
+// Quem zera o jogo (vence o chefe no Arcade) libera o Xandão para jogar; fica guardado no navegador.
+const UNLOCK_KEY = 'wf-xandao';
+export function bossUnlocked() {
+  try { return localStorage.getItem(UNLOCK_KEY) === '1'; } catch (e) { return false; }
+}
+export function unlockBoss() {
+  try { localStorage.setItem(UNLOCK_KEY, '1'); } catch (e) { /* navegador sem armazenamento */ }
+}
+// lutadores da tela de seleção: os 10, mais o Xandão depois de desbloqueado
+export const roster = () => (bossUnlocked() ? ALL_FIGHTERS : FIGHTERS);
+
 // x/y = pino vermelho no mapa original (1774x887).
 export const COUNTRIES = {
   br: { name: 'BRASIL', x: 594, y: 590 },

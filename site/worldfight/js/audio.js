@@ -22,6 +22,7 @@ const MP3 = {
   'stage-br-lula': 'stage-br-lula', 'stage-br-bolsonaro': 'stage-br-bolsonaro', 'stage-br-flavio': 'stage-br-flavio',
   'stage-ar': 'stage-ar', 'stage-py': 'stage-py', 'stage-cn': 'stage-cn', 'stage-kp': 'stage-kp',
   'stage-ru': 'stage-ru', 'stage-il': 'stage-il',
+  'stage-br-moraes': 'title', // chefe final
 };
 const MP3_GAIN = 0.55;
 const freq = (n) => 440 * Math.pow(2, (n - 69) / 12);
