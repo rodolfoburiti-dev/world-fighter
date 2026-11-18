@@ -8,7 +8,7 @@ export const FIGHTERS = [
   { id: 'putin', name: 'CZAR VLAD', country: 'ru' },
   { id: 'netanyahu', name: 'BIBIZÃO', country: 'il' },
   { id: 'kim', name: 'KIM JONG BUM', country: 'kp' },
-  { id: 'flavio', name: 'BLOZINHO', country: 'br' },
+  { id: 'flavio', name: 'BLOZINHO', country: 'br', winVoice: true }, // vitória: pose de sentido, "Sou o presidente do Brasil" (voice/win-flavio.mp3)
   { id: 'bolsonaro', name: 'BLOZO', country: 'br', winVoice: true }, // vitória: rasga a camiseta e grita (voice/win-bolsonaro.mp3)
 ];
 
