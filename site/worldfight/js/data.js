@@ -9,7 +9,7 @@ export const FIGHTERS = [
   { id: 'netanyahu', name: 'BIBIZÃO', country: 'il' },
   { id: 'kim', name: 'KIM JONG BUM', country: 'kp' },
   { id: 'flavio', name: 'BLOZINHO', country: 'br' },
-  { id: 'bolsonaro', name: 'BLOZO', country: 'br' },
+  { id: 'bolsonaro', name: 'BLOZO', country: 'br', winVoice: true }, // vitória: rasga a camiseta e grita (voice/win-bolsonaro.mp3)
 ];
 
 // x/y = pino vermelho no mapa original (1774x887).

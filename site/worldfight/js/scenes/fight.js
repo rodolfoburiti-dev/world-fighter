@@ -404,7 +404,9 @@ export class FightScene extends Phaser.Scene {
     // última luta de quem tem comemoração própria: anúncio do vencedor primeiro, a pose depois (ver FINALE)
     if (celebrates && this.sim.fighters[w].wins >= 2) {
       const now = this.time.now;
-      this.finale = { w, poseAt: now + FINALE.pose, resultAt: now + FINALE.result };
+      // o resultado só entra depois que a fala de vitória termina (cada lutador tem a sua duração)
+      const voiceMs = (this.cache.audio.get(`voice-win-${this.defs[w].id}`)?.duration || 2.8) * 1000;
+      this.finale = { w, poseAt: now + FINALE.pose, resultAt: now + Math.max(FINALE.result, FINALE.voice + voiceMs + 500) };
       this.time.delayedCall(FINALE.name, () => this.showBanner(this.defs[w].name, { sub: 'VENCEU!', hold: FINALE.pose - FINALE.name - 300, scaleFrom: 2 }));
       say(this, this.defs[w].id, FINALE.name);
       say(this, 'wins', FINALE.wins);

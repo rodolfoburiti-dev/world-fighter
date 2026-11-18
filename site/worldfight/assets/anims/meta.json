@@ -306,6 +306,9 @@
    "block": {
     "frames": 3
    },
+   "win": {
+    "frames": 5
+   },
    "walkb": {
     "frames": 6
    },
