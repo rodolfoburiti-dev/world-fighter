@@ -6,7 +6,7 @@ export const FIGHTERS = [
   { id: 'pena', name: 'PEÑITA', country: 'py' },
   { id: 'xi', name: 'XI PING PONG', country: 'cn' },
   { id: 'putin', name: 'CZAR VLAD', country: 'ru' },
-  { id: 'netanyahu', name: 'BIBIZÃO', country: 'il' },
+  { id: 'netanyahu', name: 'BIBIZÃO', country: 'il', size: 0.85 }, // desenhado agachado e corpulento: 15% menor para ficar na proporção dos outros
   { id: 'kim', name: 'KIM JONG BUM', country: 'kp' },
   { id: 'flavio', name: 'BLOZINHO', country: 'br', winVoice: true }, // vitória: pose de sentido, "Sou o presidente do Brasil" (voice/win-flavio.mp3)
   { id: 'bolsonaro', name: 'BLOZO', country: 'br', winVoice: true }, // vitória: rasga a camiseta e grita (voice/win-bolsonaro.mp3)

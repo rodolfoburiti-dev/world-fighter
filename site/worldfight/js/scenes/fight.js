@@ -130,7 +130,7 @@ export class FightScene extends Phaser.Scene {
       // animações do pacote de personagens: atlas com todos os quadros, pés alinhados na origem
       const meta = allMeta[d.id];
       const img = this.add.sprite(0, GROUND_Y, `anim-${d.id}`, 'idle_0').setOrigin(0.5, meta.originY).setDepth(10 + i);
-      img.setScale(SPRITE_H / meta.bodyH);
+      img.setScale((SPRITE_H * (d.size || 1)) / meta.bodyH); // size: ajuste de proporção por lutador (data.js)
       img.baseScale = img.scaleX;
       img.fid = d.id;
       img.meta = meta;
